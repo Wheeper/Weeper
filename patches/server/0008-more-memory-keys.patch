@@ -1,0 +1,194 @@
+From db7dfb983ec7024f93bc4828865ea4188062377d Mon Sep 17 00:00:00 2001
+From: Yannick Lamprecht <yannicklamprecht@live.de>
+Date: Sun, 3 Jan 2021 16:26:00 +0100
+Subject: [PATCH] more memory keys
+
+---
+ .../entity/memory/CraftMemoryMapper.java      | 98 +++++++++++++++++++
+ .../entity/memory/CraftMemoryKeyTest.java     | 37 +++++++
+ 2 files changed, 135 insertions(+)
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/memory/CraftMemoryMapper.java b/src/main/java/org/bukkit/craftbukkit/entity/memory/CraftMemoryMapper.java
+index 0616cdf19..2f441586d 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/memory/CraftMemoryMapper.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/memory/CraftMemoryMapper.java
+@@ -7,6 +7,36 @@ import org.bukkit.Bukkit;
+ import org.bukkit.Location;
+ import org.bukkit.craftbukkit.CraftServer;
+ import org.bukkit.craftbukkit.CraftWorld;
++// Weeper start
++import java.util.ArrayList;
++import java.util.Collection;
++import java.util.HashSet;
++import java.util.List;
++import java.util.Set;
++import java.util.function.Supplier;
++import org.bukkit.craftbukkit.entity.CraftAgeable;
++import org.bukkit.craftbukkit.entity.CraftHoglin;
++import org.bukkit.craftbukkit.entity.CraftHumanEntity;
++import org.bukkit.craftbukkit.entity.CraftItem;
++import org.bukkit.craftbukkit.entity.CraftLivingEntity;
++import org.bukkit.craftbukkit.entity.CraftMob;
++import org.bukkit.craftbukkit.entity.CraftPiglinAbstract;
++import org.bukkit.entity.Ageable;
++import org.bukkit.entity.Hoglin;
++import org.bukkit.entity.HumanEntity;
++import org.bukkit.entity.Item;
++import org.bukkit.entity.LivingEntity;
++import org.bukkit.entity.Mob;
++import org.bukkit.entity.PiglinAbstract;
++import org.bukkit.util.Vector;
++import net.minecraft.server.EntityAgeable;
++import net.minecraft.server.EntityHoglin;
++import net.minecraft.server.EntityHuman;
++import net.minecraft.server.EntityInsentient;
++import net.minecraft.server.EntityItem;
++import net.minecraft.server.EntityLiving;
++import net.minecraft.server.EntityPiglinAbstract;
++// Weeper end
+ 
+ public final class CraftMemoryMapper {
+ 
+@@ -21,6 +51,31 @@ public final class CraftMemoryMapper {
+             return (UUID) object;
+         } else if (object instanceof Boolean) {
+             return (Boolean) object;
++        // Weeper start
++        } else if (object instanceof Integer) {
++            return (Integer) object;
++        } else if (object instanceof EntityHuman) {
++            return ((EntityHuman) object).getBukkitEntity();
++        } else if (object instanceof EntityItem) {
++            return (Item)((EntityItem) object).getBukkitEntity();
++        } else if (object instanceof EntityHoglin) {
++            return (Hoglin)((EntityHoglin) object).getBukkitEntity();
++        } else if (object instanceof EntityPiglinAbstract) {
++            return (PiglinAbstract) ((EntityPiglinAbstract) object).getBukkitEntity();
++        } else if (object instanceof EntityAgeable) {
++            return (Ageable) ((EntityAgeable) object).getBukkitEntity();
++        } else if (object instanceof EntityInsentient) {
++            return (Mob) ((EntityInsentient) object).getBukkitEntity();
++        } else if (object instanceof EntityLiving) {
++            return (LivingEntity) ((EntityLiving) object).getBukkitEntity();
++        } else if(object instanceof BlockPosition){
++            BlockPosition blockPosition = (BlockPosition) object;
++            return new Vector(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
++        } else if (object instanceof Set){
++            return fromNms((Set<?>) object, HashSet::new);
++        } else if (object instanceof List){
++            return fromNms((List<?>) object, ArrayList::new);
++        // Weeper end
+         }
+ 
+         throw new UnsupportedOperationException("Do not know how to map " + object);
+@@ -37,6 +92,31 @@ public final class CraftMemoryMapper {
+             return (UUID) object;
+         } else if (object instanceof Boolean) {
+             return (Boolean) object;
++        // Weeper start
++        } else if (object instanceof Integer) {
++            return (Integer) object;
++        } else if(object instanceof HumanEntity) {
++            return (EntityHuman) ((CraftHumanEntity)object).getHandle();
++        } else if(object instanceof CraftItem){
++            return (EntityItem) ((CraftItem)object).getHandle();
++        } else if(object instanceof Hoglin){
++            return (EntityHoglin) ((CraftHoglin)object).getHandle();
++        } else if(object instanceof PiglinAbstract){
++            return (EntityPiglinAbstract) ((CraftPiglinAbstract)object).getHandle();
++        } else if(object instanceof Ageable){
++            return (EntityAgeable) ((CraftAgeable)object).getHandle();
++        } else if(object instanceof Mob){
++            return (EntityInsentient) ((CraftMob)object).getHandle();
++        } else if(object instanceof LivingEntity) {
++            return (EntityLiving) ((CraftLivingEntity) object).getHandle();
++        } else if(object instanceof Vector){
++            Vector vector = (Vector) object;
++            return new BlockPosition(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
++        } else if (object instanceof Set){
++            return toNms((Set<?>) object, HashSet::new);
++        } else if (object instanceof List){
++            return toNms((List<?>) object, ArrayList::new);
++        // Weeper end
+         }
+ 
+         throw new UnsupportedOperationException("Do not know how to map " + object);
+@@ -49,4 +129,22 @@ public final class CraftMemoryMapper {
+     public static GlobalPos toNms(Location location) {
+         return GlobalPos.create(((CraftWorld) location.getWorld()).getHandle().getDimensionKey(), new BlockPosition(location.getX(), location.getY(), location.getZ()));
+     }
++
++    // Weeper start
++    public static <T extends Collection<Object>> T toNms(Collection<?> set, Supplier<T> tSupplier) {
++        T result = tSupplier.get();
++        for (Object o: set){
++            result.add(toNms(o));
++        }
++        return result;
++    }
++
++    public static <T extends Collection<Object>> T fromNms(Collection<?> set, Supplier<T> tSupplier) {
++        T result = tSupplier.get();
++        for (Object o: set){
++            result.add(fromNms(o));
++        }
++        return result;
++    }
++    // Weeper end
+ }
+diff --git a/src/test/java/org/bukkit/entity/memory/CraftMemoryKeyTest.java b/src/test/java/org/bukkit/entity/memory/CraftMemoryKeyTest.java
+index 2bda0c73a..e6aab49e1 100644
+--- a/src/test/java/org/bukkit/entity/memory/CraftMemoryKeyTest.java
++++ b/src/test/java/org/bukkit/entity/memory/CraftMemoryKeyTest.java
+@@ -8,6 +8,13 @@ import org.bukkit.craftbukkit.entity.memory.CraftMemoryKey;
+ import org.bukkit.support.AbstractTestingBase;
+ import org.junit.Assert;
+ import org.junit.Test;
++// Weeper start
++import java.util.Arrays;
++import java.util.HashMap;
++import java.util.Map;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++// Weeper end
+ 
+ public class CraftMemoryKeyTest extends AbstractTestingBase {
+ 
+@@ -72,4 +79,34 @@ public class CraftMemoryKeyTest extends AbstractTestingBase {
+             }
+         }
+     }
++
++  // Weeper start
++  @Test
++  public void shouldReturnAnInstanceOfMemoryKeyWhenBukkitRepresentationOfKeyisAvailable() {
++    Map<MemoryModuleType<?>, MemoryKey<?>> keyMap = new HashMap<>();
++    for (MemoryModuleType<?> memoryModuleType : IRegistry.MEMORY_MODULE_TYPE) {
++      MemoryKey<?> bukkitNoKey = CraftMemoryKey.toMemoryKey(memoryModuleType);
++
++      if (Arrays.asList(
++          MemoryModuleType.DUMMY,
++          MemoryModuleType.PATH,
++          MemoryModuleType.WALK_TARGET,
++          MemoryModuleType.LOOK_TARGET,
++          MemoryModuleType.HURT_BY
++      ).contains(memoryModuleType)) {
++        // ignore these as we do not map them
++        continue;
++      }
++      keyMap.put(memoryModuleType, bukkitNoKey);
++      if (bukkitNoKey == null) {
++        LoggerFactory.getLogger(getClass()).error("MemoryModule \"{}\" is not represented by MemoryKey",
++            IRegistry.MEMORY_MODULE_TYPE.getKey(memoryModuleType));
++      }
++    }
++    long presentCount = keyMap.entrySet().stream()
++        .filter(memoryModuleTypeMemoryKeyEntry -> memoryModuleTypeMemoryKeyEntry.getValue() != null)
++        .count();
++    Assert.assertEquals("Size should be the same!", keyMap.size(), presentCount);
++  }
++  // Weeper end
+ }
+-- 
+2.30.0
+

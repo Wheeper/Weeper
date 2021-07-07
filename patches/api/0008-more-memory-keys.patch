@@ -1,0 +1,188 @@
+From 21428e5c73c026c188d74343c61d8a0f01d9d3a3 Mon Sep 17 00:00:00 2001
+From: Yannick Lamprecht <yannicklamprecht@live.de>
+Date: Sun, 3 Jan 2021 15:16:43 +0100
+Subject: [PATCH] more memory keys
+
+---
+ .../org/bukkit/entity/memory/MemoryKey.java   | 126 +++++++++++++++++-
+ 1 file changed, 125 insertions(+), 1 deletion(-)
+
+diff --git a/src/main/java/org/bukkit/entity/memory/MemoryKey.java b/src/main/java/org/bukkit/entity/memory/MemoryKey.java
+index 905d5f6d..61a5a936 100644
+--- a/src/main/java/org/bukkit/entity/memory/MemoryKey.java
++++ b/src/main/java/org/bukkit/entity/memory/MemoryKey.java
+@@ -8,6 +8,20 @@ import java.util.UUID;
+ import org.bukkit.Keyed;
+ import org.bukkit.Location;
+ import org.bukkit.NamespacedKey;
++// Weeper start
++import java.lang.reflect.ParameterizedType;
++import java.lang.reflect.Type;
++import java.util.List;
++import org.bukkit.entity.Ageable;
++import org.bukkit.entity.Entity;
++import org.bukkit.entity.Hoglin;
++import org.bukkit.entity.HumanEntity;
++import org.bukkit.entity.Item;
++import org.bukkit.entity.LivingEntity;
++import org.bukkit.entity.Mob;
++import org.bukkit.entity.PiglinAbstract;
++import org.bukkit.util.Vector;
++// Weeper end
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+@@ -17,10 +31,11 @@ import org.jetbrains.annotations.Nullable;
+  *
+  * @param <T> the class type of the memory value
+  */
+-public final class MemoryKey<T> implements Keyed {
++public class MemoryKey<T> implements Keyed {
+ 
+     private final NamespacedKey namespacedKey;
+     private final Class<T> tClass;
++    private Class<?> cClass = null; // Weeper
+ 
+     private MemoryKey(NamespacedKey namespacedKey, Class<T> tClass) {
+         this.namespacedKey = namespacedKey;
+@@ -28,6 +43,26 @@ public final class MemoryKey<T> implements Keyed {
+         MEMORY_KEYS.put(namespacedKey, this);
+     }
+ 
++    // Weeper start
++    private MemoryKey(String key){
++        this(NamespacedKey.minecraft(key));
++    }
++    private MemoryKey(NamespacedKey namespacedKey){
++        this.namespacedKey = namespacedKey;
++
++        Type superclassType = getClass().getGenericSuperclass();
++        Type type =  ((ParameterizedType)superclassType).getActualTypeArguments()[0];
++        if(ParameterizedType.class.isAssignableFrom(type.getClass())){
++            this.tClass = (Class<T>) ((ParameterizedType)type).getActualTypeArguments()[0];
++            this.cClass = (Class<?>) ((ParameterizedType) type).getRawType();;
++        } else {
++            this.tClass = (Class<T>) ((ParameterizedType)superclassType).getActualTypeArguments()[0];
++            this.cClass = null;
++        }
++        MEMORY_KEYS.put(namespacedKey, this);
++    }
++    // Weeper end
++
+     @NotNull
+     @Override
+     public NamespacedKey getKey() {
+@@ -44,21 +79,110 @@ public final class MemoryKey<T> implements Keyed {
+         return tClass;
+     }
+ 
++    // Weeper start
++    @Nullable
++    public Class<?> getCollection(){
++        return cClass;
++    }
++    // Weeper end
++
+     private static final Map<NamespacedKey, MemoryKey> MEMORY_KEYS = new HashMap<>();
+     //
++    /**
++     * Where this villager's bed is or where the piglin brute's patrol point is.
++     */
+     public static final MemoryKey<Location> HOME = new MemoryKey<>(NamespacedKey.minecraft("home"), Location.class);
+     public static final MemoryKey<Location> POTENTIAL_JOB_SITE = new MemoryKey<>(NamespacedKey.minecraft("potential_job_site"), Location.class);
++    /**
++     * Where this villager's job site block is.
++     */
+     public static final MemoryKey<Location> JOB_SITE = new MemoryKey<>(NamespacedKey.minecraft("job_site"), Location.class);
++    /**
++     * Where this villager's meeting point is.
++     *
++     */
+     public static final MemoryKey<Location> MEETING_POINT = new MemoryKey<>(NamespacedKey.minecraft("meeting_point"), Location.class);
++
+     public static final MemoryKey<Boolean> GOLEM_DETECTED_RECENTLY = new MemoryKey<>(NamespacedKey.minecraft("golem_detected_recently"), Boolean.class);
++    /**
++     * The tick that the villager last slept in a bed.
++     */
+     public static final MemoryKey<Long> LAST_SLEPT = new MemoryKey<>(NamespacedKey.minecraft("last_slept"), Long.class);
++    /**
++     * The tick that the villager last woke up from a bed.
++     */
+     public static final MemoryKey<Long> LAST_WOKEN = new MemoryKey<>(NamespacedKey.minecraft("last_woken"), Long.class);
++    /**
++     * The tick that the villager last worked at their job site.
++     */
+     public static final MemoryKey<Long> LAST_WORKED_AT_POI = new MemoryKey<>(NamespacedKey.minecraft("last_worked_at_poi"), Long.class);
++
++    /**
++     * Optional. If the axolotl is pretending to be dead.
++     */
++    public static final MemoryKey<Long> PLAY_DEAD_TICKS = new MemoryKey<>(NamespacedKey.minecraft("play_dead_ticks"), Long.class);
++
+     public static final MemoryKey<Boolean> UNIVERSAL_ANGER = new MemoryKey<>(NamespacedKey.minecraft("universal_anger"), Boolean.class);
++    /**
++     * The target of this piglin or this piglin brute.
++     */
+     public static final MemoryKey<UUID> ANGRY_AT = new MemoryKey<>(NamespacedKey.minecraft("angry_at"), UUID.class);
++    /**
++     * If the piglin is admiring an item.
++     */
+     public static final MemoryKey<Boolean> ADMIRING_ITEM = new MemoryKey<>(NamespacedKey.minecraft("admiring_item"), Boolean.class);
++    /**
++     * If the piglin can admire an item at this moment, set when being converting, when hurt or after just admiring an item.
++     */
+     public static final MemoryKey<Boolean> ADMIRING_DISABLED = new MemoryKey<>(NamespacedKey.minecraft("admiring_disabled"), Boolean.class);
++    /**
++     * If the piglin just hunted, and as such, won't for a while. Set after hunting or spawning in a bastion remnant.
++     */
+     public static final MemoryKey<Boolean> HUNTED_RECENTLY = new MemoryKey<>(NamespacedKey.minecraft("hunted_recently"), Boolean.class);
++    // Weeper start
++    public static final MemoryKey<Long> HEARD_BELL_TIME = new MemoryKey<>("heard_bell_time"){};
++    public static final MemoryKey<Long> CANT_REACH_WALK_TARGET_SINCE = new MemoryKey<>("cant_reach_walk_target_since"){};
++    public static final MemoryKey<Location> SECONDARY_JOB_SITE = new MemoryKey<>("secondary_job_site"){};
++    public static final MemoryKey<Location> HIDING_PLACE = new MemoryKey<>("hiding_place"){};
++    public static final MemoryKey<Location> NEAREST_BED = new MemoryKey<>("nearest_bed"){};
++    public static final MemoryKey<Vector> CELEBRATE_LOCATION = new MemoryKey<>("celebrate_location"){};
++    public static final MemoryKey<Vector> NEAREST_REPELLENT = new MemoryKey<>("nearest_repellent"){};
++    public static final MemoryKey<Boolean> ATTACK_COOLING_DOWN = new MemoryKey<>("attack_cooling_down"){};
++    public static final MemoryKey<Boolean> PACIFIED = new MemoryKey<>("pacified"){};
++    public static final MemoryKey<Boolean> DISABLE_WALK_TO_ADMIRE_ITEM = new MemoryKey<>("disable_walk_to_admire_item"){};
++    public static final MemoryKey<Boolean> ATE_RECENTLY = new MemoryKey<>("ate_recently"){};
++    public static final MemoryKey<Boolean> DANCING = new MemoryKey<>("dancing"){};
++    public static final MemoryKey<Integer> TIME_TRYING_TO_REACH_ADMIRE_ITEM = new MemoryKey<>("time_trying_to_reach_admire_item"){};
++    public static final MemoryKey<Integer> VISIBLE_ADULT_PIGLIN_COUNT = new MemoryKey<>("visible_adult_piglin_count"){};
++    public static final MemoryKey<Integer> VISIBLE_ADULT_HOGLIN_COUNT = new MemoryKey<>("visible_adult_hoglin_count"){};
++    public static final MemoryKey<HumanEntity> NEAREST_VISIBLE_PLAYER = new MemoryKey<>("nearest_visible_player"){};
++    public static final MemoryKey<HumanEntity> NEAREST_VISIBLE_TARGETABLE_PLAYER = new MemoryKey<>("nearest_visible_targetable_player"){};
++    public static final MemoryKey<LivingEntity> ATTACK_TARGET = new MemoryKey<>("attack_target"){};
++    public static final MemoryKey<LivingEntity> INTERACTION_TARGET = new MemoryKey<>("interaction_target"){};
++    public static final MemoryKey<LivingEntity> HURT_BY_ENTITY = new MemoryKey<>("hurt_by_entity"){};
++    public static final MemoryKey<LivingEntity> AVOID_TARGET = new MemoryKey<>("avoid_target"){};
++    public static final MemoryKey<LivingEntity> NEAREST_HOSTILE = new MemoryKey<>("nearest_hostile"){};
++    public static final MemoryKey<Ageable> BREED_TARGET = new MemoryKey<>("breed_target"){};
++    public static final MemoryKey<Entity> RIDE_TARGET = new MemoryKey<>("ride_target"){};
++    public static final MemoryKey<Ageable> NEAREST_VISIBLE_ADULT = new MemoryKey<>("nearest_visible_adult"){};
++    public static final MemoryKey<Item> NEAREST_VISIBLE_WANTED_ITEM = new MemoryKey<>("nearest_visible_wanted_item"){};
++    public static final MemoryKey<Mob> NEAREST_VISIBLE_NEMSIS = new MemoryKey<>("nearest_visible_nemesis"){};
++    public static final MemoryKey<Hoglin> NEAREST_VISIBLE_HUNTABLE_HOGLIN = new MemoryKey<>("nearest_visible_huntable_hoglin"){};
++    public static final MemoryKey<Hoglin> NEAREST_VISIBLE_BABY_HOGLIN = new MemoryKey<>("nearest_visible_baby_hoglin"){};
++    public static final MemoryKey<HumanEntity> NEAREST_TARGETABLE_PLAYER_NOT_WEARING_GOLD = new MemoryKey<>("nearest_targetable_player_not_wearing_gold"){};
++    public static final MemoryKey<HumanEntity> NEAREST_PLAYER_HOLDING_WANTED_ITEM = new MemoryKey<>("nearest_player_holding_wanted_item"){};
++    public static final MemoryKey<PiglinAbstract> NEAREST_VISIBLE_ADULT_PIGLIN = new MemoryKey<>("nearest_visible_adult_piglin"){};
++    public static final MemoryKey<LivingEntity> NEAREST_VISIBLE_ZOMBIFIED = new MemoryKey<>("nearest_visible_zombified"){};
++    public static final MemoryKey<List<Location>> INTERACTABLE_DOORS = new MemoryKey<>("interactable_doors"){};
++    public static final MemoryKey<Set<Location>> DOORS_TO_CLOSE = new MemoryKey<>("doors_to_close"){};
++    public static final MemoryKey<List<PiglinAbstract>> NEARBY_ADULT_PIGLINS = new MemoryKey<>("nearby_adult_piglins"){};
++    public static final MemoryKey<List<PiglinAbstract>> NEAREST_VISIBLE_ADULT_PIGLINS = new MemoryKey<>("nearest_visible_adult_piglins"){};
++    public static final MemoryKey<List<Hoglin>> NEAREST_VISIBLE_ADULT_HOGLINS = new MemoryKey<>("nearest_visible_adult_hoglins"){};
++    public static final MemoryKey<List<LivingEntity>> MOBS = new MemoryKey<>("mobs"){};
++    public static final MemoryKey<List<LivingEntity>> VISIBLE_MOBS = new MemoryKey<>("visible_mobs"){};
++    public static final MemoryKey<List<LivingEntity>> VISIBLE_VILLAGER_BABIES = new MemoryKey<>("visible_villager_babies"){};
++    public static final MemoryKey<List<HumanEntity>> NEAREST_PLAYERS = new MemoryKey<>("nearest_players"){};
++    // Weeper end
+ 
+     /**
+      * Returns a {@link MemoryKey} by a {@link NamespacedKey}.
+-- 
+2.30.0
+
