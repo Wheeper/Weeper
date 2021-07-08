@@ -1,4 +1,4 @@
-# ForkTest - A Paper fork, using paperweight
+# Weeper - Relaxed like weed and stable like Paper, using paperweight #
 
 This is an example project, showcasing how to setup a fork of paper (or well, any project), using paperweight.
 
