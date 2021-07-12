@@ -58,7 +58,7 @@ index af7a73e3e5d83490fd71280c8ecbfcc32e69c6bc..4332c973e225a5d6453435052baa3b37
          initial.execute(players);
 diff --git a/src/main/java/com/github/weepingmc/util/ColorUtil.java b/src/main/java/com/github/weepingmc/util/ColorUtil.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..59f44c91aa0fae01d01ead207d36cc8310a984f3
+index 0000000000000000000000000000000000000000..a64157dc0ac048837f82698900a60837880d776d
 --- /dev/null
 +++ b/src/main/java/com/github/weepingmc/util/ColorUtil.java
 @@ -0,0 +1,34 @@
