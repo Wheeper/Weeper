@@ -5,7 +5,7 @@ Subject: [PATCH] fix constants until upstream is on 1.1.9
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index ecfdf5a65910af4a75dc2c607184bbfcddb91007..accb28e80d349365b5e0cfc907256af4f8d11fbe 100644
+index e5a72e021bf46d16c94e8ca9bea149b0d60411fb..de6f86a325bf4103ccef2bab8ba26cad68de67d2 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -3,7 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
@@ -17,7 +17,7 @@ index ecfdf5a65910af4a75dc2c607184bbfcddb91007..accb28e80d349365b5e0cfc907256af4
  import io.papermc.paperweight.util.Git
  import io.papermc.paperweight.util.cache
  import io.papermc.paperweight.util.defaultOutput
-@@ -119,8 +119,8 @@ val patchReobfMappings by tasks.registering<PatchMappings> {
+@@ -117,8 +117,8 @@ val patchReobfMappings by tasks.registering<PatchMappings> {
      inputMappings.set(generateReobfMappings.flatMap { it.reobfMappings })
      patch.set(rootProject.layout.cache.resolve("paperweight/upstreams/paper/build-data/reobf-mappings-patch.tiny"))
  
