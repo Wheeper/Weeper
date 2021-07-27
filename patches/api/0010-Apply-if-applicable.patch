@@ -1,0 +1,77 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Yannick Lamprecht <yannicklamprecht@live.de>
+Date: Tue, 27 Jul 2021 21:35:22 +0200
+Subject: [PATCH] Apply if applicable
+
+
+diff --git a/src/main/java/org/bukkit/inventory/ItemStack.java b/src/main/java/org/bukkit/inventory/ItemStack.java
+index f3fa8f7f021464aa9d463c14550487cc7d48c873..f0d4990667a9683d5f99f5e32830e17283f99fb8 100644
+--- a/src/main/java/org/bukkit/inventory/ItemStack.java
++++ b/src/main/java/org/bukkit/inventory/ItemStack.java
+@@ -6,6 +6,7 @@ import java.util.List; // Paper
+ import java.util.Map;
+ import java.util.Set; // Paper
+ import org.apache.commons.lang.Validate;
++import org.apache.commons.lang3.tuple.Pair;
+ import org.bukkit.Bukkit;
+ import org.bukkit.Material;
+ import org.bukkit.UndefinedNullability;
+@@ -15,6 +16,7 @@ import org.bukkit.enchantments.Enchantment;
+ import org.bukkit.inventory.meta.Damageable;
+ import org.bukkit.inventory.meta.ItemMeta;
+ import org.bukkit.material.MaterialData;
++import org.bukkit.util.Consumer;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+@@ -567,6 +569,50 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, net.kyor
+         return false;
+     }
+     // Paper end
++    // Weeper start
++    /**
++     * Applies the modification on the item meta to the itemstack.
++     *
++     * Consumer is only called when item meta of the itemstack is instance of the class provided.
++     *
++     * @param itemMetaClass the class the item meta should be cast to if applicable
++     * @param castedMeta the casted meta you can modify
++     * @param <T> any item meta
++     */
++    public <T extends ItemMeta> void applyTo(@NotNull Class<T> itemMetaClass, @NotNull Consumer<T> castedMeta){
++        ItemMeta itemMeta = getItemMeta();
++        if (meta != null) {
++            if(itemMetaClass.isInstance(itemMeta)){
++                castedMeta.accept(itemMetaClass.cast(itemMeta));
++                setItemMeta(itemMeta);
++            }
++        }
++    }
++
++    /**
++     * Applies the modification on the item meta to the itemstack.
++     *
++     * Consumer is only called when item meta of the itemstack is instance of the class provided.
++     *
++     * @param castedMetaClassConsumerTupel the class the item meta should be cast to if applicable and the casted meta you can modify
++     * @param <T> any item meta
++     */
++    public <T extends ItemMeta> void applyTo(@NotNull Pair<@NotNull Class<T>, @NotNull Consumer<T>>... castedMetaClassConsumerTupel){
++        ItemMeta itemMeta = getItemMeta();
++        boolean anyApplicable = false;
++        if (meta != null) {
++            for (Pair<Class<T>, Consumer<T>> classConsumerPair : castedMetaClassConsumerTupel) {
++                if(classConsumerPair.getKey().isInstance(itemMeta)){
++                    classConsumerPair.getValue().accept(classConsumerPair.getKey().cast(itemMeta));
++                    anyApplicable = true;
++                }
++            }
++            if(anyApplicable){
++                setItemMeta(itemMeta);
++            }
++        }
++    }
++    // Weeper end
+ 
+     /**
+      * Get a copy of this ItemStack's {@link ItemMeta}.
