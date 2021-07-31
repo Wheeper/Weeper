@@ -4,18 +4,6 @@ Date: Sat, 19 Jun 2021 21:36:14 +0200
 Subject: [PATCH] add deprecation annotations where javadoc is bitching
 
 
-diff --git a/src/main/java/com/destroystokyo/paper/event/player/PlayerInitialSpawnEvent.java b/src/main/java/com/destroystokyo/paper/event/player/PlayerInitialSpawnEvent.java
-index 8b1fdb9d2869d4c1862d557c91bf8a1d8c537507..626e97bbcaa19d55475a0fc8770412d437af2733 100644
---- a/src/main/java/com/destroystokyo/paper/event/player/PlayerInitialSpawnEvent.java
-+++ b/src/main/java/com/destroystokyo/paper/event/player/PlayerInitialSpawnEvent.java
-@@ -8,6 +8,7 @@ import org.spigotmc.event.player.PlayerSpawnLocationEvent;
- /**
-  * @deprecated Use {@link PlayerSpawnLocationEvent}, Duplicate API
-  */
-+@Deprecated
- public class PlayerInitialSpawnEvent extends PlayerSpawnLocationEvent {
- 
-     public PlayerInitialSpawnEvent(@NotNull Player who, @NotNull Location spawnLocation) {
 diff --git a/src/main/java/org/bukkit/World.java b/src/main/java/org/bukkit/World.java
 index fd36aeaaef7500bb90dac7f57d418af97602f361..e01ee0a05fc7734eb2c690b6fec03d5f1d81cc97 100644
 --- a/src/main/java/org/bukkit/World.java
@@ -29,49 +17,15 @@ index fd36aeaaef7500bb90dac7f57d418af97602f361..e01ee0a05fc7734eb2c690b6fec03d5f
       */
      @Deprecated(forRemoval = true)
      default void triggerBlockEntityEvent(@NotNull Location location, int action, int actionParameter){
-diff --git a/src/main/java/org/bukkit/entity/LingeringPotion.java b/src/main/java/org/bukkit/entity/LingeringPotion.java
-index f124b35ec76e6cb6a1a0dc464005087043c3efd0..bafef53c1d449135f1300c8c8fbb06f482ba67e1 100644
---- a/src/main/java/org/bukkit/entity/LingeringPotion.java
-+++ b/src/main/java/org/bukkit/entity/LingeringPotion.java
-@@ -5,4 +5,5 @@ package org.bukkit.entity;
-  *
-  * @deprecated lingering status depends on only on the potion item.
-  */
-+@Deprecated
- public interface LingeringPotion extends ThrownPotion { }
 diff --git a/src/main/java/org/bukkit/event/enchantment/PrepareItemEnchantEvent.java b/src/main/java/org/bukkit/event/enchantment/PrepareItemEnchantEvent.java
-index 2ff1b1308571d8f8056d3359e8a8ba4a589c3726..0cb628e193addda19d994d2767dd168e5ae46d0c 100644
+index e669ad8ecd182c6899c7820414e6ee1f7312d699..a40c01662aada6313efddf4ecf71f30d0df55bc5 100644
 --- a/src/main/java/org/bukkit/event/enchantment/PrepareItemEnchantEvent.java
 +++ b/src/main/java/org/bukkit/event/enchantment/PrepareItemEnchantEvent.java
-@@ -68,6 +68,7 @@ public class PrepareItemEnchantEvent extends InventoryEvent implements Cancellab
-      * @return experience level costs offered
-      * @deprecated Use {@link #getOffers()} instead of this method
+@@ -86,6 +86,7 @@ public class PrepareItemEnchantEvent extends InventoryEvent implements Cancellab
+      *
+      * @return list of available enchantment offers
       */
 +    @Deprecated
      @NotNull
-     public int[] getExpLevelCostsOffered() {
-         int[] levelOffers = new int[offers.length];
-diff --git a/src/main/java/org/bukkit/inventory/ItemStack.java b/src/main/java/org/bukkit/inventory/ItemStack.java
-index a7909406e9d54c1ab4789b984ed6b1da50837fce..f3fa8f7f021464aa9d463c14550487cc7d48c873 100644
---- a/src/main/java/org/bukkit/inventory/ItemStack.java
-+++ b/src/main/java/org/bukkit/inventory/ItemStack.java
-@@ -69,6 +69,7 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, net.kyor
-      * @param damage durability / damage
-      * @deprecated see {@link #setDurability(short)}
-      */
-+    @Deprecated
-     public ItemStack(@NotNull final Material type, final int amount, final short damage) {
-         this(type, amount, damage, null);
-     }
-diff --git a/src/main/java/org/bukkit/material/Step.java b/src/main/java/org/bukkit/material/Step.java
-index 9f502e7ee05d0512e190a1722cc112ece068c4e2..4286f6a968d40da194d850054e95244db0687766 100644
---- a/src/main/java/org/bukkit/material/Step.java
-+++ b/src/main/java/org/bukkit/material/Step.java
-@@ -78,6 +78,7 @@ public class Step extends TexturedMaterial {
-      *
-      * @deprecated Magic value
-      */
-+    @Deprecated
-     @Override
-     protected int getTextureIndex() {
-         return getData() & 0x7;
+     public EnchantmentOffer[] getOffers() {
+         return offers;
