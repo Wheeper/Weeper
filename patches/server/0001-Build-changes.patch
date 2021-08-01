@@ -94,6 +94,19 @@ index 128b268539e956d0f78084b62c10138e6eb4c22a..ec6b50150ad111148fc32997fbff192b
      // Contributed by Techcable <Techcable@outlook.com> in GH-65
      private static int fetchDistanceFromGitHub(@Nonnull String repo, @Nonnull String branch, @Nonnull String hash) {
          try {
+diff --git a/src/main/java/net/pl3x/purpur/PurpurConfig.java b/src/main/java/net/pl3x/purpur/PurpurConfig.java
+index 526a1032a2f61792c7f5791dbb3e9a7292fc186d..e0d451a38244e33f22eb3fec06d2145bc7ddea21 100644
+--- a/src/main/java/net/pl3x/purpur/PurpurConfig.java
++++ b/src/main/java/net/pl3x/purpur/PurpurConfig.java
+@@ -326,7 +326,7 @@ public class PurpurConfig {
+         if (!TimingsManager.hiddenConfigs.contains("settings.seed")) TimingsManager.hiddenConfigs.add("settings.seed");
+     }
+ 
+-    public static String serverModName = "Purpur";
++    public static String serverModName = "Weeper";
+     private static void serverModName() {
+         serverModName = getString("settings.server-mod-name", serverModName);
+     }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 index 072532ca2c6868a29a019c4f79b44e4aaa02ffa7..b70240d2313e8ddddc47b7de4c2ac82988960a86 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
