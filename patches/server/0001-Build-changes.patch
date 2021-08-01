@@ -5,7 +5,7 @@ Subject: [PATCH] Build changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index b7e5bdcfe04ab7d8d8d453a787849963640262a5..e5a72e021bf46d16c94e8ca9bea149b0d60411fb 100644
+index d658b7502185f1f7c938d510e2f8404fdaa66bb6..de6f86a325bf4103ccef2bab8ba26cad68de67d2 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -34,7 +34,7 @@ repositories {
@@ -27,9 +27,18 @@ index b7e5bdcfe04ab7d8d8d453a787849963640262a5..e5a72e021bf46d16c94e8ca9bea149b0
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index d50b61876f15d95b836b3dd81d9c3492c91a8448..5d4bd6af9ecd95d426ba05c0b0e17a05f22de65e 100644
+index d50b61876f15d95b836b3dd81d9c3492c91a8448..2bfee8b03f80500d2416c0989846913dc4065954 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
+@@ -18,7 +18,7 @@ import java.util.stream.StreamSupport;
+ 
+ public class PaperVersionFetcher implements VersionFetcher {
+     private static final java.util.regex.Pattern VER_PATTERN = java.util.regex.Pattern.compile("^([0-9\\.]*)\\-.*R"); // R is an anchor, will always give '-R' at end
+-    private static final String GITHUB_BRANCH_NAME = "master";
++    private static final String GITHUB_BRANCH_NAME = "main";
+     private static @Nullable String mcVer;
+ 
+     @Override
 @@ -29,8 +29,8 @@ public class PaperVersionFetcher implements VersionFetcher {
      @Nonnull
      @Override
