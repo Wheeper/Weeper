@@ -29,7 +29,7 @@ index 9cd98c6fcfa3eb439d9013ef76ef4661175a0e5a..eb6959f760170a73ee566ace4452cbd8
      public NamespacedKey getNamespacedKey() {
          return namespacedKey;
 diff --git a/src/main/java/com/destroystokyo/paper/entity/ai/VanillaGoal.java b/src/main/java/com/destroystokyo/paper/entity/ai/VanillaGoal.java
-index 659193fc0596084031c09aa47fbb428a93d052e8..ca7aa94623d7d870495ab2129ce754cb0beda3df 100644
+index 7921f2766f16fbd49e2afd0bba0ef30f6eefd0ce..386fa3854b991e59f46df8ce3ede74ab86f57f7b 100644
 --- a/src/main/java/com/destroystokyo/paper/entity/ai/VanillaGoal.java
 +++ b/src/main/java/com/destroystokyo/paper/entity/ai/VanillaGoal.java
 @@ -11,189 +11,741 @@ import org.bukkit.entity.*;
@@ -773,4 +773,4 @@ index 659193fc0596084031c09aa47fbb428a93d052e8..ca7aa94623d7d870495ab2129ce754cb
 +     */
      GoalKey<Raider> RAIDER_MOVE_THROUGH_VILLAGE = GoalKey.of(Raider.class, NamespacedKey.minecraft("raider_move_through_village"));
  
-     /**
+     // Purpur start

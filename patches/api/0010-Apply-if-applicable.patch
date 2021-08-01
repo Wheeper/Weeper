@@ -5,7 +5,7 @@ Subject: [PATCH] Apply if applicable
 
 
 diff --git a/src/main/java/org/bukkit/inventory/ItemStack.java b/src/main/java/org/bukkit/inventory/ItemStack.java
-index f3fa8f7f021464aa9d463c14550487cc7d48c873..f0d4990667a9683d5f99f5e32830e17283f99fb8 100644
+index bbf0f3c1cddb3b11020a80424a4dbca1b53f1c2c..5271c95f2e1f19c406a8de853b74c666ee3f8580 100644
 --- a/src/main/java/org/bukkit/inventory/ItemStack.java
 +++ b/src/main/java/org/bukkit/inventory/ItemStack.java
 @@ -6,6 +6,7 @@ import java.util.List; // Paper
@@ -23,8 +23,8 @@ index f3fa8f7f021464aa9d463c14550487cc7d48c873..f0d4990667a9683d5f99f5e32830e172
 +import org.bukkit.util.Consumer;
  import org.jetbrains.annotations.NotNull;
  import org.jetbrains.annotations.Nullable;
- 
-@@ -567,6 +569,50 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, net.kyor
+ // Purpur start
+@@ -579,6 +581,50 @@ public class ItemStack implements Cloneable, ConfigurationSerializable, net.kyor
          return false;
      }
      // Paper end

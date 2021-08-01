@@ -5,7 +5,7 @@ Subject: [PATCH] player track entity events
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index 0fcd6a9162f5bddb3c4fc42b3a64efde7c7d9a9b..00c496daff88850e1fe5c828ca88fd43ebeffbff 100644
+index f9c37b2ca0d1b8415dc32127650f449e7eec81d8..0171c7a783ff2e28a1dda19f78a9a2b9eb34eaa9 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
 @@ -1,7 +1,10 @@
@@ -35,7 +35,7 @@ index 0fcd6a9162f5bddb3c4fc42b3a64efde7c7d9a9b..00c496daff88850e1fe5c828ca88fd43
  import org.bukkit.event.player.PlayerVelocityEvent;
  // CraftBukkit end
  
-@@ -234,7 +237,7 @@ public class ServerEntity {
+@@ -235,7 +238,7 @@ public class ServerEntity {
              boolean cancelled = false;
  
              if (this.entity instanceof ServerPlayer) {
@@ -44,7 +44,7 @@ index 0fcd6a9162f5bddb3c4fc42b3a64efde7c7d9a9b..00c496daff88850e1fe5c828ca88fd43
                  org.bukkit.util.Vector velocity = player.getVelocity();
  
                  PlayerVelocityEvent event = new PlayerVelocityEvent(player, velocity.clone());
-@@ -259,6 +262,7 @@ public class ServerEntity {
+@@ -276,6 +279,7 @@ public class ServerEntity {
      public void removePairing(ServerPlayer player) {
          this.entity.stopSeenByPlayer(player);
          player.connection.send(new ClientboundRemoveEntitiesPacket(new int[]{this.entity.getId()}));
@@ -52,7 +52,7 @@ index 0fcd6a9162f5bddb3c4fc42b3a64efde7c7d9a9b..00c496daff88850e1fe5c828ca88fd43
      }
  
      public void addPairing(ServerPlayer player) {
-@@ -280,7 +284,11 @@ public class ServerEntity {
+@@ -297,7 +301,11 @@ public class ServerEntity {
          Packet<?> packet = this.entity.getAddEntityPacket();
  
          this.yHeadRotp = Mth.floor(this.entity.getYHeadRot() * 256.0F / 360.0F);

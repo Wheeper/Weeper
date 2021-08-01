@@ -5,36 +5,36 @@ Subject: [PATCH] Build changes
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index d658b7502185f1f7c938d510e2f8404fdaa66bb6..de6f86a325bf4103ccef2bab8ba26cad68de67d2 100644
+index 0f87b2104253705608e402e28b8b262ae2181206..9cff915ca082c0bb0f296c0ac641de545bb14da4 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -34,7 +34,7 @@ repositories {
+@@ -35,7 +35,7 @@ repositories {
  }
  
  dependencies {
--    implementation(project(":Tuinity-API")) // Tuinity
+-    implementation(project(":Purpur-API")) // Purpur
 +    implementation(project(":Weeper-API")) // Weeper
-     implementation("com.destroystokyo.paper:paper-mojangapi:1.16.5-R0.1-SNAPSHOT") // Tuinity
+     implementation("io.papermc.paper:paper-mojangapi:1.17.1-R0.1-SNAPSHOT") // Purpur
      // Paper start
      implementation("org.jline:jline-terminal-jansi:3.12.1")
-@@ -86,7 +86,7 @@ tasks.jar {
+@@ -89,7 +89,7 @@ tasks.jar {
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
--            "Implementation-Version" to "git-Tuinity-$implementationVersion", // Tuinity
+-            "Implementation-Version" to "git-Purpur-$implementationVersion", // Purpur
 +            "Implementation-Version" to "git-Weeper-$implementationVersion", // Tuinity
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index d50b61876f15d95b836b3dd81d9c3492c91a8448..2bfee8b03f80500d2416c0989846913dc4065954 100644
+index 128b268539e956d0f78084b62c10138e6eb4c22a..ec6b50150ad111148fc32997fbff192bfc6dd167 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 @@ -18,7 +18,7 @@ import java.util.stream.StreamSupport;
  
  public class PaperVersionFetcher implements VersionFetcher {
      private static final java.util.regex.Pattern VER_PATTERN = java.util.regex.Pattern.compile("^([0-9\\.]*)\\-.*R"); // R is an anchor, will always give '-R' at end
--    private static final String GITHUB_BRANCH_NAME = "master";
+-    private static final String JENKINS_URL = "https://ci.pl3x.net/job/Purpur/lastSuccessfulBuild/buildNumber"; // Purpur
 +    private static final String GITHUB_BRANCH_NAME = "main";
      private static @Nullable String mcVer;
  
@@ -43,48 +43,79 @@ index d50b61876f15d95b836b3dd81d9c3492c91a8448..2bfee8b03f80500d2416c0989846913d
      @Nonnull
      @Override
      public Component getVersionMessage(@Nonnull String serverVersion) {
--        String[] parts = serverVersion.substring("git-Tuinity-".length()).split("[-\\s]"); // Tuinity
--        final Component updateMessage = getUpdateStatusMessage("Spottedleaf/Tuinity", GITHUB_BRANCH_NAME, parts[0]); // Tuinity
+-        String[] parts = serverVersion.substring("git-Purpur-".length()).split("[-\\s]"); // Tuinity // Purpur
+-        final Component updateMessage = getUpdateStatusMessage("pl3xgaming/Purpur", "ver/" + getMinecraftVersion(), parts[0]); // Tuinity // Purpur
 +        String[] parts = serverVersion.substring("git-Weeper-".length()).split("[-\\s]"); // Tuinity
 +        final Component updateMessage = getUpdateStatusMessage("WeepingMc/Weeper", GITHUB_BRANCH_NAME, parts[0]); // Tuinity
          final Component history = getHistory();
  
          return history != null ? TextComponent.ofChildren(updateMessage, Component.newline(), history) : updateMessage;
-diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f25bb4214cffd0050241ea229b6acb0c16b2b0a5..f518bd70185847fc30caf81132ff15c4aa97960e 100644
---- a/src/main/java/net/minecraft/server/MinecraftServer.java
-+++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1716,7 +1716,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -54,18 +54,8 @@ public class PaperVersionFetcher implements VersionFetcher {
  
-     @DontObfuscate
-     public String getServerModName() {
--        return "Tuinity"; // Tuinity - Tuinity > //Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
-+        return "Weeper"; //Weeper - Weeper > // Tuinity - Tuinity > //Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
+     private static Component getUpdateStatusMessage(@Nonnull String repo, @Nonnull String branch, @Nonnull String versionInfo) {
+         int distance;
+-        // Purpur start - put this back...
+-        try {
+-            int build = Integer.parseInt(versionInfo);
+-            distance = fetchDistanceFromSiteApi(build, getMinecraftVersion());
+-            if (distance < 0) {
+-                distance = fetchDistanceFromJenkins(build);
+-            }
+-        } catch (NumberFormatException ignored) {
+-            versionInfo = versionInfo.replace("\"", "");
+-            distance = fetchDistanceFromGitHub(repo, branch, versionInfo);
+-        }
+-        // Purpur end
++        versionInfo = versionInfo.replace("\"", "");
++        distance = fetchDistanceFromGitHub(repo, branch, versionInfo);
+ 
+         switch (distance) {
+             case -1:
+@@ -99,22 +89,6 @@ public class PaperVersionFetcher implements VersionFetcher {
+         }
      }
  
-     public SystemReport fillSystemReport(SystemReport details) {
+-    // Purpur start
+-    private static int fetchDistanceFromJenkins(int jenkinsBuild) {
+-        try {
+-            try (BufferedReader reader = Resources.asCharSource(new URL(JENKINS_URL), Charsets.UTF_8).openBufferedStream()) {
+-                return Integer.decode(reader.readLine()) - jenkinsBuild;
+-            } catch (NumberFormatException ex) {
+-                ex.printStackTrace();
+-                return -2;
+-            }
+-        } catch (IOException e) {
+-            e.printStackTrace();
+-            return -1;
+-        }
+-    }
+-    // Purpur end
+-
+     // Contributed by Techcable <Techcable@outlook.com> in GH-65
+     private static int fetchDistanceFromGitHub(@Nonnull String repo, @Nonnull String branch, @Nonnull String hash) {
+         try {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 1ec307d705087eec9d867f9f8e8858ac388f3846..fbbccee104dc4b898686878c42abbb390f9c9c09 100644
+index 072532ca2c6868a29a019c4f79b44e4aaa02ffa7..b70240d2313e8ddddc47b7de4c2ac82988960a86 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -239,7 +239,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
--    private final String serverName = "Tuinity"; // Tuinity // Paper
+-    private final String serverName = "Purpur"; // Paper // Tuinity // Purpur
 +    private final String serverName = "Weeper"; // Weeper // Tuinity // Paper
      private final String serverVersion;
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-index 001b1e5197eaa51bfff9031aa6c69876c9a47960..ed515cb7503d207fd1e00e48ef6d20c6ab8b4f7f 100644
+index 13b98439320ac1401a920c01d7cf5a4b3a23deff..ed515cb7503d207fd1e00e48ef6d20c6ab8b4f7f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 @@ -11,7 +11,7 @@ public final class Versioning {
      public static String getBukkitVersion() {
          String result = "Unknown-Version";
  
--        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/com.tuinity/tuinity-api/pom.properties"); // Tuinity
+-        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/net.pl3x.purpur/purpur-api/pom.properties"); // Tuinity // Purpur
 +        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/com.github.weepingmc.weeper/weeper-api/pom.properties"); // Tuinity
          Properties properties = new Properties();
  

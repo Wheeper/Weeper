@@ -52,12 +52,12 @@ subprojects {
 paperweight {
     serverProject.set(project(":Weeper-Server"))
 
-    useStandardUpstream("tuinity") {
-        url.set(github("Tuinity", "Tuinity"))
-        ref.set(providers.gradleProperty("tuinityRef"))
+    useStandardUpstream("purpur") {
+        url.set(github("pl3xgaming", "Purpur"))
+        ref.set(providers.gradleProperty("upstreamRef"))
 
         withStandardPatcher {
-            baseName("Tuinity")
+            baseName("Purpur")
 
             apiPatchDir.set(layout.projectDirectory.dir("patches/api"))
             apiOutputDir.set(layout.projectDirectory.dir("Weeper-API"))
