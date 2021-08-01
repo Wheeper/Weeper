@@ -1,0 +1,33 @@
+on:
+  push:
+    branches:
+      - master
+      - main
+      - develop
+    tags:
+      - '*.*.*'
+jobs:
+  build:
+    strategy:
+      matrix:
+        java-version: [ '16' ]
+        os: [ 'ubuntu-latest']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v1
+      - name: Setup Java ${{ matrix.java-version }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java-version }}
+          architecture: x64
+      - name: Build with gradle
+        run: ./gradlew applyPatches shadowJar paperclipJar
+      - uses: "actions/upload-artifact@v2"
+        with:
+          name: "paperclip"
+          path: "weeper-paperclip.jar"
+      - uses: "actions/upload-artifact@v2"
+        with:
+          name: "api"
+          path: "Weeper-API/build/libs/Weeper-API-*.jar"

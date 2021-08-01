@@ -1,15 +1,15 @@
 stages:
   - build
-  - deploy
 
 artefacts:
   stage: build
   script:
     - "./gradlew applyPatches"
-    - "./gradlew shadowJar reobf"
+    - "./gradlew shadowJar reobf paperclipJar"
   artifacts:
     name: "$CI_BUILD_REF_NAME"
     expire_in: '1 week'
     paths:
       - "Weeper-API/build/libs/*.jar"
       - "Weeper-Server/build/libs/*.jar"
+      - "weeper-paperclip.jar"
