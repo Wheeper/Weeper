@@ -13,5 +13,3 @@ artefacts:
     expire_in: '1 week'
     paths:
       - "Weeper-API/build/libs/*.jar"
-      - "Weeper-Server/build/libs/*.jar"
-      - "weeper-paperclip.jar"
