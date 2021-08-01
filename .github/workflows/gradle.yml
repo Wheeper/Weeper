@@ -21,6 +21,10 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           architecture: x64
+      - name: Set fake github mail
+        run: git config user.email "dummy@example.com"
+      - name: Set fake github user
+        run: git config user.name "Master Dummy"
       - name: Apply Patches
         run: ./gradlew applyPatches
       - name: ShadowJar
