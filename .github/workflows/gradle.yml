@@ -21,8 +21,12 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           architecture: x64
-      - name: Build with gradle
-        run: ./gradlew applyPatches shadowJar paperclipJar
+      - name: Apply Patches
+        run: ./gradlew applyPatches
+      - name: ShadowJar
+        run: ./gradlew shadowJar
+      - name: Generate Paperclip jar
+        run: ./gradlew paperclipJar
       - uses: "actions/upload-artifact@v2"
         with:
           name: "paperclip"
