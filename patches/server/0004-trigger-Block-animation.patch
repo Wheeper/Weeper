@@ -5,26 +5,28 @@ Subject: [PATCH] trigger Block animation
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 2d59a2ee00feb596f5066b4a118dd06ec156ace7..71e3d2975a15f3114dfdd8e128da5d7c82b02b6f 100644
+index 5d5e3fa4d1fd9a2d0cfb5caae9b1ad153745208b..68d6cde8edd7eee7df4a62dbe96dac4a91f777ae 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -66,6 +66,7 @@ import net.minecraft.world.level.GameRules;
+@@ -45,6 +45,9 @@ import net.minecraft.world.level.ClipContext;
+ import net.minecraft.world.level.Explosion;
+ import net.minecraft.world.level.GameRules;
  import net.minecraft.world.level.block.Blocks;
- import net.minecraft.world.level.block.ChorusFlowerBlock;
- import net.minecraft.world.level.block.DiodeBlock;
++import net.minecraft.world.level.block.ChorusFlowerBlock;
++import net.minecraft.world.level.block.DiodeBlock;
 +import net.minecraft.world.level.block.entity.BlockEntity;
  import net.minecraft.world.level.chunk.ChunkAccess;
  import net.minecraft.world.level.chunk.ChunkStatus;
  import net.minecraft.world.level.chunk.ImposterProtoChunk;
-@@ -257,6 +258,7 @@ import org.bukkit.util.BoundingBox;
+@@ -114,6 +117,7 @@ import org.bukkit.util.BoundingBox;
  import org.bukkit.util.Consumer;
  import org.bukkit.util.RayTraceResult;
  import org.bukkit.util.Vector;
 +import org.jetbrains.annotations.NotNull;
  
- public class CraftWorld implements World {
+ public class CraftWorld extends CraftRegionAccessor implements World {
      public static final int CUSTOM_DIMENSION_OFFSET = 10;
-@@ -2675,6 +2677,16 @@ public class CraftWorld implements World {
+@@ -1980,6 +1984,16 @@ public class CraftWorld extends CraftRegionAccessor implements World {
      public DragonBattle getEnderDragonBattle() {
          return (this.getHandle().dragonFight() == null) ? null : new CraftDragonBattle(this.getHandle().dragonFight());
      }
