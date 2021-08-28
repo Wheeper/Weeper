@@ -5,8 +5,6 @@ artefacts:
   stage: build
   script:
     - "./gradlew applyPatches"
-    - "./gradlew shadowJar"
-    - "./gradlew reobf"
     - "./gradlew paperclipJar"
   artifacts:
     name: "$CI_BUILD_REF_NAME"

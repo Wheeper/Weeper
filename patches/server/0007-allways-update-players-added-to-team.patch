@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Yannick Lamprecht <yannicklamprecht@live.de>
+Date: Sat, 28 Aug 2021 18:25:23 +0200
+Subject: [PATCH] allways update players added to team
+
+
+diff --git a/src/main/java/com/github/weepingmc/packet/CraftPacketStepBuilder.java b/src/main/java/com/github/weepingmc/packet/CraftPacketStepBuilder.java
+index 4332c973e225a5d6453435052baa3b3765dbc1f9..49bdf0508002bff456f4e699f4bf6b8d8a36c456 100644
+--- a/src/main/java/com/github/weepingmc/packet/CraftPacketStepBuilder.java
++++ b/src/main/java/com/github/weepingmc/packet/CraftPacketStepBuilder.java
+@@ -95,7 +95,7 @@ public class CraftPacketStepBuilder implements PacketStepBuilder {
+     public PacketStepBuilder setPlayerTeam(@Nonnull Team team, @Nonnull TeamMode teamMode) {
+         var nmsTeam = ((CraftTeam)team).getHandle();
+         var packet = switch (teamMode){
+-            case CREATE_TEAM, UPDATE_TEAM_INFO -> ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(nmsTeam, teamMode == TeamMode.UPDATE_TEAM_INFO);
++            case CREATE_TEAM, UPDATE_TEAM_INFO -> ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(nmsTeam, true);
+             case REMOVE_TEAM -> ClientboundSetPlayerTeamPacket.createRemovePacket(nmsTeam);
+             case ADD_PLAYERS_TO_TEAM, REMOVE_PLAYERS_FROM_TEAM -> {
+                 var operation = (teamMode == TeamMode.ADD_PLAYERS_TO_TEAM)  ?  Action.ADD: Action.REMOVE;
